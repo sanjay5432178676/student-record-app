@@ -1,60 +1,27 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Search Student - Student Record System</title>
+    <title>Search Student</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #eef5ff;
-            text-align: center;
-            margin-top: 60px;
-        }
-        h2 {
-            color: #333;
-        }
-        form {
-            display: inline-block;
-            background-color: #fff;
-            padding: 30px 40px;
-            border-radius: 12px;
-            box-shadow: 0 0 12px rgba(0,0,0,0.1);
-        }
-        input[type="text"] {
-            width: 250px;
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 8px;
-            border: 1px solid #ccc;
-        }
-        input[type="submit"] {
-            background-color: #007bff;
-            color: white;
-            padding: 10px 25px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-        .back {
-            margin-top: 20px;
-        }
-        .back a {
-            color: #007bff;
-            text-decoration: none;
-        }
-        .back a:hover {
-            text-decoration: underline;
-        }
+        body { font-family: Arial; text-align: center; background: #e0f7fa; padding: 40px; }
+        input { padding: 10px; margin: 10px; width: 250px; }
     </style>
 </head>
 <body>
-    <h2>Search Student by Roll Number</h2>
-    <form action="/search" method="post">
-        <input type="text" name="roll" placeholder="Enter Roll Number" required><br>
+    <h2>🔍 Search Student by Roll Number</h2>
+    <form method="POST">
+        <input name="roll" placeholder="Enter Roll Number" required>
         <input type="submit" value="Search">
     </form>
 
-    <div class="back">
-        <a href="/">← Back to Dashboard</a>
+    {% if student %}
+    <div style="margin-top: 20px; background: white; padding: 20px; display: inline-block;">
+        <p><b>Name:</b> {{ student[1] }}</p>
+        <p><b>Roll:</b> {{ student[2] }}</p>
+        <p><b>Department:</b> {{ student[3] }}</p>
+        <p><b>Total:</b> {{ student[7] }}</p>
+        <p><b>Grade:</b> {{ student[8] }}</p>
     </div>
+    {% endif %}
 </body>
 </html>

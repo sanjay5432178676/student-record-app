@@ -1,127 +1,198 @@
-from flask import Flask, render_template, request, redirect, session
+from flask import Flask, render_template, request, redirect, session, Response
+import sqlite3
+from io import StringIO
+import os
 
 app = Flask(__name__)
-app.secret_key = "secret_key_123"  # Needed for session
+app.secret_key = 'your_secret_key'  # Change for security
 
-# Function to calculate total, average, grade
-def compute_results(marks):
-    total = sum(marks)
-    average = total / len(marks)
-    if average >= 90:
-        grade = 'A'
-    elif average >= 75:
-        grade = 'B'
-    elif average >= 60:
-        grade = 'C'
-    elif average >= 50:
-        grade = 'D'
-    else:
-        grade = 'F'
-    return total, average, grade
+# ---------- INIT DATABASE ----------
+def init_user_db():
+    conn = sqlite3.connect('user.db')
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT UNIQUE,
+            password TEXT
+        )
+    ''')
+    conn.commit()
+    conn.close()
 
-# -------------- Register --------------
+def init_student_db():
+    conn = sqlite3.connect('student.db')
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS students (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT,
+            roll TEXT,
+            dept TEXT,
+            m1 INTEGER,
+            m2 INTEGER,
+            m3 INTEGER,
+            total INTEGER,
+            grade TEXT
+        )
+    ''')
+    conn.commit()
+    conn.close()
+
+init_user_db()
+init_student_db()
+
+# ---------- ROUTES ----------
+@app.route('/')
+def index():
+    if 'username' in session:
+        return render_template('index.html', username=session['username'])
+    return redirect('/login')
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        with open("users.txt", "a") as f:
-            f.write(f"{username},{password}\n")
-        return redirect('/login')
+        try:
+            conn = sqlite3.connect('user.db')
+            cursor = conn.cursor()
+            cursor.execute('INSERT INTO users (username, password) VALUES (?, ?)', (username, password))
+            conn.commit()
+            return redirect('/login')
+        except sqlite3.IntegrityError:
+            return render_template('error.html', message='Username already exists.')
     return render_template('register.html')
 
-# -------------- Login --------------
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        try:
-            with open("users.txt", "r") as f:
-                for line in f:
-                    user, pwd = line.strip().split(",")
-                    if user == username and pwd == password:
-                        session['user'] = username
-                        return redirect('/')
-        except FileNotFoundError:
-            pass
-        return render_template('error.html', message="Invalid username or password.")
+        conn = sqlite3.connect('user.db')
+        cursor = conn.cursor()
+        cursor.execute('SELECT * FROM users WHERE username=? AND password=?', (username, password))
+        user = cursor.fetchone()
+        if user:
+            session['username'] = username
+            session['is_admin'] = (username == 'admin')
+            return redirect('/')
+        else:
+            return render_template('error.html', message='Invalid credentials.')
     return render_template('login.html')
 
-# -------------- Logout --------------
 @app.route('/logout')
 def logout():
-    session.pop('user', None)
+    session.clear()
     return redirect('/login')
 
-# -------------- Home / Dashboard --------------
-@app.route('/')
-def index():
-    if 'user' not in session:
-        return redirect('/login')
-    return render_template('index.html', user=session['user'])
-
-# -------------- Add Student --------------
-@app.route('/add', methods=['GET', 'POST'])
+@app.route('/add_student', methods=['GET', 'POST'])
 def add_student():
-    if 'user' not in session:
+    if 'username' not in session or not session.get('is_admin'):
         return redirect('/login')
     if request.method == 'POST':
-        roll = request.form['roll']
         name = request.form['name']
-        marks = [int(request.form[f'mark{i}']) for i in range(1, 6)]
-        total, average, grade = compute_results(marks)
-        with open("students.txt", "a") as f:
-            f.write(f"{roll},{name},{','.join(map(str, marks))},{total},{average:.2f},{grade}\n")
-        return render_template("result.html", roll=roll, name=name, marks=marks,
-                               total=total, average=average, grade=grade)
+        roll = request.form['roll']
+        dept = request.form['dept']
+        m1, m2, m3 = int(request.form['m1']), int(request.form['m2']), int(request.form['m3'])
+        total = m1 + m2 + m3
+        grade = 'A' if total >= 250 else 'B' if total >= 200 else 'C'
+
+        conn = sqlite3.connect('student.db')
+        cursor = conn.cursor()
+        cursor.execute('''
+            INSERT INTO students (name, roll, dept, m1, m2, m3, total, grade)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (name, roll, dept, m1, m2, m3, total, grade))
+        conn.commit()
+        conn.close()
+
+        return render_template('result.html', name=name, roll=roll, dept=dept, m1=m1, m2=m2, m3=m3, total=total, grade=grade)
     return render_template('add_student.html')
 
-# -------------- View All Students --------------
-@app.route('/view')
+@app.route('/view_students')
 def view_students():
-    if 'user' not in session:
+    if 'username' not in session:
         return redirect('/login')
-    students = []
-    try:
-        with open("students.txt", "r") as f:
-            for line in f:
-                data = line.strip().split(",")
-                students.append(data)
-    except FileNotFoundError:
-        pass
+    conn = sqlite3.connect('student.db')
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM students')
+    students = cursor.fetchall()
+    conn.close()
     return render_template('view_students.html', students=students)
 
-# -------------- Search Student --------------
 @app.route('/search', methods=['GET', 'POST'])
 def search():
-    if 'user' not in session:
+    if 'username' not in session:
         return redirect('/login')
+    student = None
     if request.method == 'POST':
         roll = request.form['roll']
-        try:
-            with open("students.txt", "r") as f:
-                for line in f:
-                    data = line.strip().split(",")
-                    if data[0] == roll:
-                        return render_template('result.html',
-                            roll=data[0], name=data[1],
-                            marks=data[2:7], total=data[7],
-                            average=data[8], grade=data[9])
-        except FileNotFoundError:
-            pass
-        return render_template('error.html', message="Student not found.")
-    return render_template('search.html')
+        conn = sqlite3.connect('student.db')
+        cursor = conn.cursor()
+        cursor.execute('SELECT * FROM students WHERE roll = ?', (roll,))
+        student = cursor.fetchone()
+        conn.close()
+    return render_template('search.html', student=student)
 
-# -------------- Error Page --------------
+@app.route('/edit/<int:id>', methods=['GET', 'POST'])
+def edit(id):
+    if 'username' not in session or not session.get('is_admin'):
+        return redirect('/login')
+    conn = sqlite3.connect('student.db')
+    cursor = conn.cursor()
+    if request.method == 'POST':
+        name = request.form['name']
+        roll = request.form['roll']
+        dept = request.form['dept']
+        m1, m2, m3 = int(request.form['m1']), int(request.form['m2']), int(request.form['m3'])
+        total = m1 + m2 + m3
+        grade = 'A' if total >= 250 else 'B' if total >= 200 else 'C'
+        cursor.execute('''
+            UPDATE students SET name=?, roll=?, dept=?, m1=?, m2=?, m3=?, total=?, grade=? WHERE id=?
+        ''', (name, roll, dept, m1, m2, m3, total, grade, id))
+        conn.commit()
+        conn.close()
+        return redirect('/view_students')
+    cursor.execute('SELECT * FROM students WHERE id=?', (id,))
+    student = cursor.fetchone()
+    conn.close()
+    return render_template('edit_student.html', student=student)
+
+@app.route('/delete/<int:id>')
+def delete(id):
+    if 'username' not in session or not session.get('is_admin'):
+        return redirect('/login')
+    conn = sqlite3.connect('student.db')
+    cursor = conn.cursor()
+    cursor.execute('DELETE FROM students WHERE id=?', (id,))
+    conn.commit()
+    conn.close()
+    return redirect('/view_students')
+
+@app.route('/download')
+def download():
+    if 'username' not in session or not session.get('is_admin'):
+        return redirect('/login')
+    conn = sqlite3.connect('student.db')
+    cursor = conn.cursor()
+    cursor.execute('SELECT name, roll, dept, m1, m2, m3, total, grade FROM students')
+    students = cursor.fetchall()
+    conn.close()
+
+    output = StringIO()
+    writer = csv.writer(output)
+    writer.writerow(['Name', 'Roll', 'Department', 'Mark1', 'Mark2', 'Mark3', 'Total', 'Grade'])
+    writer.writerows(students)
+    output.seek(0)
+
+    return Response(output, mimetype="text/csv", headers={"Content-Disposition": "attachment;filename=students.csv"})
+
 @app.route('/error')
 def error():
     return render_template('error.html', message="Something went wrong.")
 
-# -------------- Run Server --------------
-import os
-
+# ---------- RUN SERVER ----------
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port)
-
+    port = int(os.environ.get("PORT", 10000))  # Render uses dynamic port
+    app.run(debug=True, host='0.0.0.0', port=port)

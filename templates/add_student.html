@@ -1,90 +1,23 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Add Student - Student Record System</title>
+    <title>Add Student</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f3f6fb;
-            text-align: center;
-            margin-top: 40px;
-        }
-        h2 {
-            color: #333;
-        }
-        form {
-            display: inline-block;
-            background-color: #fff;
-            padding: 30px 40px;
-            border-radius: 12px;
-            box-shadow: 0 0 12px rgba(0,0,0,0.1);
-            text-align: left;
-        }
-        label {
-            display: block;
-            margin: 10px 0 5px;
-            font-weight: bold;
-        }
-        input[type="text"], input[type="number"] {
-            width: 100%;
-            padding: 8px;
-            border-radius: 6px;
-            border: 1px solid #ccc;
-        }
-        input[type="submit"] {
-            margin-top: 20px;
-            background-color: #007bff;
-            color: white;
-            padding: 10px 30px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            width: 100%;
-        }
-        input[type="submit"]:hover {
-            background-color: #0056b3;
-        }
-        .back {
-            margin-top: 20px;
-        }
-        .back a {
-            color: #007bff;
-            text-decoration: none;
-        }
-        .back a:hover {
-            text-decoration: underline;
-        }
+        body { font-family: Arial; text-align: center; background: #eef; padding: 40px; }
+        form { display: inline-block; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 0 10px #ccc; }
+        input { display: block; margin: 10px auto; padding: 10px; width: 250px; }
     </style>
 </head>
 <body>
-    <h2>Add New Student</h2>
-    <form action="/add" method="post">
-        <label>Roll Number:</label>
-        <input type="text" name="roll" required>
-
-        <label>Name:</label>
-        <input type="text" name="name" required>
-
-        <label>Marks for Subject 1:</label>
-        <input type="number" name="mark1" required>
-
-        <label>Marks for Subject 2:</label>
-        <input type="number" name="mark2" required>
-
-        <label>Marks for Subject 3:</label>
-        <input type="number" name="mark3" required>
-
-        <label>Marks for Subject 4:</label>
-        <input type="number" name="mark4" required>
-
-        <label>Marks for Subject 5:</label>
-        <input type="number" name="mark5" required>
-
-        <input type="submit" value="Save Student">
+    <h2>➕ Add Student Record</h2>
+    <form method="POST">
+        <input name="name" placeholder="Student Name" required>
+        <input name="roll" placeholder="Roll Number" required>
+        <input name="dept" placeholder="Department" required>
+        <input name="m1" type="number" placeholder="Mark 1" required>
+        <input name="m2" type="number" placeholder="Mark 2" required>
+        <input name="m3" type="number" placeholder="Mark 3" required>
+        <input type="submit" value="Add Student">
     </form>
-
-    <div class="back">
-        <a href="/">← Back to Dashboard</a>
-    </div>
 </body>
 </html>

@@ -1,45 +1,17 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Error - Student Record System</title>
+    <title>Error</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #ffeef0;
-            text-align: center;
-            margin-top: 80px;
-        }
-        .error-box {
-            display: inline-block;
-            background-color: #fff;
-            padding: 30px 40px;
-            border-radius: 12px;
-            box-shadow: 0 0 10px rgba(255, 0, 0, 0.1);
-        }
-        h2 {
-            color: #d8000c;
-            margin-bottom: 15px;
-        }
-        p {
-            color: #333;
-            font-size: 16px;
-        }
-        a {
-            display: block;
-            margin-top: 20px;
-            color: #007bff;
-            text-decoration: none;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
+        body { font-family: Arial; text-align: center; padding: 50px; background: #ffe6e6; }
+        .msg { background: white; padding: 20px; display: inline-block; border-radius: 10px; border: 1px solid #ff0000; }
     </style>
 </head>
 <body>
-    <div class="error-box">
-        <h2>Error Occurred</h2>
+    <div class="msg">
+        <h2>❌ Error Occurred</h2>
         <p>{{ message }}</p>
-        <a href="/">← Back to Home</a>
+        <a href="/">Go to Home</a>
     </div>
 </body>
 </html>
