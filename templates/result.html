@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Result - Student Record System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f8ff;
+            text-align: center;
+            margin-top: 50px;
+        }
+        h2 {
+            color: #333;
+        }
+        .result-box {
+            display: inline-block;
+            background-color: #fff;
+            padding: 30px 50px;
+            border-radius: 12px;
+            box-shadow: 0 0 12px rgba(0,0,0,0.1);
+            text-align: left;
+        }
+        .result-box p {
+            margin: 10px 0;
+            font-size: 16px;
+        }
+        .result-box strong {
+            color: #444;
+        }
+        .back {
+            margin-top: 20px;
+        }
+        .back a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .back a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <h2>Student Result</h2>
+    <div class="result-box">
+        <p><strong>Roll Number:</strong> {{ roll }}</p>
+        <p><strong>Name:</strong> {{ name }}</p>
+        <p><strong>Marks:</strong> {{ marks[0] }}, {{ marks[1] }}, {{ marks[2] }}, {{ marks[3] }}, {{ marks[4] }}</p>
+        <p><strong>Total Marks:</strong> {{ total }}</p>
+        <p><strong>Average:</strong> {{ average }}</p>
+        <p><strong>Grade:</strong> {{ grade }}</p>
+    </div>
+
+    <div class="back">
+        <a href="/">← Back to Dashboard</a>
+    </div>
+</body>
+</html>

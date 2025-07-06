@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard - Student Record System</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f5f9ff;
+        }
+        header {
+            background-color: #3c00ff;
+            padding: 20px;
+            color: white;
+            text-align: center;
+        }
+        .container {
+            text-align: center;
+            margin-top: 60px;
+        }
+        h2 {
+            color: #333;
+        }
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 40px;
+        }
+        .nav-buttons a {
+            display: inline-block;
+            text-decoration: none;
+            background-color: #004cd9;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+        .nav-buttons a:hover {
+            background-color: #004a9f;
+        }
+        .logout {
+            margin-top: 60px;
+        }
+        .logout a {
+            color: red;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .logout a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Student Academic Record Management System</h1>
+    </header>
+
+    <div class="container">
+        <h2>Welcome, {{ user }} 🎓</h2>
+
+        <div class="nav-buttons">
+            <a href="/add">➕ Add Student</a>
+            <a href="/view">📋 View All Students</a>
+            <a href="/search">🔍 Search Student</a>
+        </div>
+
+        <div class="logout">
+            <a href="/logout">🚪 Logout</a>
+        </div>
+    </div>
+
+</body>
+</html>

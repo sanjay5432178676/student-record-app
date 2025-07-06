@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>All Students - Student Record System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2fcff;
+            text-align: center;
+            margin-top: 40px;
+        }
+        h2 {
+            color: #333;
+        }
+        table {
+            margin: 20px auto;
+            border-collapse: collapse;
+            width: 90%;
+        }
+        th, td {
+            border: 1px solid #aaa;
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f8f8f8;
+        }
+        .back {
+            margin-top: 20px;
+        }
+        .back a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .back a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <h2>All Student Records</h2>
+    {% if students %}
+    <table>
+        <tr>
+            <th>Roll No</th>
+            <th>Name</th>
+            <th>Subject 1</th>
+            <th>Subject 2</th>
+            <th>Subject 3</th>
+            <th>Subject 4</th>
+            <th>Subject 5</th>
+            <th>Total</th>
+            <th>Average</th>
+            <th>Grade</th>
+        </tr>
+        {% for s in students %}
+        <tr>
+            <td>{{ s[0] }}</td>
+            <td>{{ s[1] }}</td>
+            <td>{{ s[2] }}</td>
+            <td>{{ s[3] }}</td>
+            <td>{{ s[4] }}</td>
+            <td>{{ s[5] }}</td>
+            <td>{{ s[6] }}</td>
+            <td>{{ s[7] }}</td>
+            <td>{{ s[8] }}</td>
+            <td>{{ s[9] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <p>No student records found.</p>
+    {% endif %}
+
+    <div class="back">
+        <a href="/">← Back to Dashboard</a>
+    </div>
+</body>
+</html>
